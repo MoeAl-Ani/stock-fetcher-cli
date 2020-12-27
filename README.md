@@ -1,7 +1,7 @@
-#Stock Fetcher
+# Stock Fetcher
 - a simple stock fetcher cli written in rust.
 
-#License
+# License
 ```MIT License
 
 Copyright (c) 2020 infotamia
