@@ -13,6 +13,13 @@ mod email;
 
 #[tokio::main]
 async fn main() {
+    let number_validator = |v: String| {
+        v.parse::<i32>().unwrap_or_else(|error| {
+            eprintln!("{}", error);
+            process::exit(1);
+        });
+        Ok(())
+    };
     let allowed_values: [&str; 1] = ["BTC-USD"];
     let matches = App::new("stock-fetcher")
         .version("1.0.0")
@@ -58,6 +65,22 @@ async fn main() {
             .help("email configuration path")
             .value_name("path/to/email_config.json")
             .default_value("email_config.json"))
+        .arg(Arg::with_name("high")
+            .short("hi")
+            .long("high")
+            .required(true)
+            .takes_value(true)
+            .empty_values(false)
+            .validator(number_validator)
+            .help("set the high threshold"))
+        .arg(Arg::with_name("low")
+            .short("lo")
+            .long("low")
+            .required(true)
+            .takes_value(true)
+            .empty_values(false)
+            .validator(number_validator)
+            .help("set the low threshold"))
         .get_matches_safe().unwrap_or_else(|error| {
         eprintln!("{}", error);
         process::exit(1);
@@ -72,6 +95,9 @@ async fn main() {
         eprintln!("no email supplied");
         process::exit(1);
     });
+
+    let low = matches.value_of("low").unwrap().parse::<i32>().unwrap();
+    let high = matches.value_of("high").unwrap().parse::<i32>().unwrap();
     let name = format!("");
 
     let api = stock_api::YahooApi::new();
@@ -90,24 +116,29 @@ async fn main() {
 
     let mut now = SystemTime::now();
     let email_service = email::EmailService::new(&email_config_path.to_string());
-    let mut email_sender = || {
+    let mut email_sender = |subject: String, content: String| {
         let seconds = now.elapsed().unwrap().as_secs();
-        if seconds > 10 && true {
+        if seconds > 10 {
             println!("sending email!");
-            email_service.send("info@infotamia.com", email, "stock-fetch update", "current price hitting the threshold!");
+            email_service.send("info@infotamia.com", email, subject.as_str(), content.as_str());
             now = SystemTime::now();
         }
     };
 
     while infinite {
         thread::sleep(Duration::new(1,0));
-        email_sender();
         let option = api.fetch(&name, &symbol.to_string()).await;
         let stock_data = option.unwrap_or_else(|| {
             eprintln!("no stock data found!");
             process::exit(1);
         });
 
+        let price = stock_data.regular_market_price.clone() as i32;
+        if price >= high {
+            email_sender(format!("Jackpot 3reeda, price =  {}", price), price.to_string());
+        } else if price <= low {
+            email_sender(format!("BTC is shit, price =  {}", price), stock_data.regular_market_price.to_string());
+        }
         println!("{:?}", stock_data);
     }
     let option = api.fetch(&name, &symbol.to_string()).await;

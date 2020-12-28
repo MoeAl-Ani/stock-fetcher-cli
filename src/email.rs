@@ -22,8 +22,8 @@ impl EmailService {
         let email = EmailBuilder::new()
             .to(to)
             .from(from)
-            .subject("stock-fetcher update")
-            .html("<h1>the current price hitting the threshold!</h1>")
+            .subject(subject)
+            .html(format!("<h1>{}</h1>", content))
             .build()
             .unwrap();
 

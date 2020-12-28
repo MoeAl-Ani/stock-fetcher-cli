@@ -41,7 +41,7 @@ pub struct StockData {
     quote_type: QuoteType,
     symbol: Symbol,
     #[serde(rename = "regularMarketPrice")]
-    regular_market_price: f64,
+    pub regular_market_price: f64,
     #[serde(rename = "regularMarketDayHigh")]
     regular_market_day_high: f64,
     #[serde(rename = "regularMarketDayLow")]
