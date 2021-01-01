@@ -1,0 +1,14 @@
+#!/bin/bash
+DIR="tmp"
+if [ -d "$DIR" ]; then
+  echo "Installing config files in ${DIR}..."
+else
+  mkdir tmp
+  cd tmp
+  wget https://www.openssl.org/source/openssl-1.1.1i.tar.gz
+  tar xzf openssl-1.1.1i.tar.gz
+  export MACHINE=arm
+  export ARCH=arm
+  export CC=arm-linux-gnueabihf-gcc
+  cd openssl-1.1.1i && ./config shared && make -j 4 cd - || exit
+fi
