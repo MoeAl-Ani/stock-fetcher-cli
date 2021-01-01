@@ -1,6 +1,41 @@
 # Stock Fetcher
 - a simple stock fetcher cli written in rust.
 
+# Build requirements
+- gcc/g++/gcc-arm-linux-gnueabihf toolchain
+    - sudo apt install gcc && sudo apt install g++ && sudo apt install gcc-arm-linux-gnueabihf
+- windows toolchain
+    - sudo apt install mingw-w64
+- Rust
+    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+_ Rust targets
+    - rustup target add armv7-unknown-linux-gnueabihf
+    - rustup target add x86_64-pc-windows-gnu
+    - rustup toolchain add stable-x86_64-pc-windows-gnu
+
+# Mandatory config
+- copy email_config.json.dev to working directory where the binary is executed or cargo root dir.
+    - rename the file from email_config.json.dev -> email_config.json
+- supply your own the email config.
+
+# Building
+## Build targets (windows, linux, arm7)
+- make build
+## Build target arm7
+- make build_pi
+
+# Running
+## Linux
+- ./target/release/stock-fetcher
+## Windows
+- ./target/x86_64-pc-windows-gnu/release/stock-fetcher
+## Arm7
+- ./target/armv7-unknown-linux-gnueabihf/release/stock-fetcher
+
+# Deploying to rasberrypi
+- make deploy_pi ip=IP_ADDRESS
+
+
 # License
 ```MIT License
 
